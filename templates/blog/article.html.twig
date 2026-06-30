@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }} — Example Blog{% endblock %}
+{% block meta_description %}{{ article.description }}{% endblock %}
+
+{% block body %}
+    {% set accent = {
+        'AI Engineering': 'text-brand-violet',
+        'Platform Engineering': 'text-brand-blue',
+        'Cloud Economics': 'text-[#9bb800]',
+        'Architecture': 'text-brand-pink',
+    }[article.category]|default('text-slatey-400') %}
+
+    {# ── Article header ───────────────────────────────────────────── #}
+    <header class="relative overflow-hidden bg-hero-glow">
+        <div class="absolute inset-0 bg-[radial-gradient(55%_55%_at_75%_-10%,rgba(0,80,255,0.16),transparent_60%)]"></div>
+        <div class="relative mx-auto max-w-prose px-5 pb-14 pt-8">
+            <div class="flex items-center justify-between text-white">
+                {% include 'partials/_logo.html.twig' %}
+                <a href="{{ path('home') }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-white/55 transition-colors hover:text-white">
+                    <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 8H4m0 0 4-4M4 8l4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    All articles
+                </a>
+            </div>
+
+            <span class="mt-12 block text-xs font-semibold uppercase tracking-wide {{ accent }}">{{ article.category }}</span>
+            <h1 class="mt-3 font-display text-3xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl">
+                {{ article.title }}
+            </h1>
+            <p class="mt-5 text-lg leading-relaxed text-white/60">{{ article.description }}</p>
+
+            <div class="mt-8 flex items-center gap-3">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/15">{{ article.authorInitials }}</span>
+                <div class="text-sm leading-tight">
+                    <p class="font-medium text-white">{{ article.author }}{% if article.role %}<span class="text-white/40"> · {{ article.role }}</span>{% endif %}</p>
+                    <p class="text-white/45">{{ article.date|date('F j, Y') }} &middot; {{ article.readingTime }} min read</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {# ── Article body ─────────────────────────────────────────────── #}
+    <article class="mx-auto max-w-prose px-5 py-14">
+        <div class="article-prose">
+            {{ article.content|raw }}
+        </div>
+
+        {% if article.tags %}
+            <div class="mt-12 flex flex-wrap gap-2 border-t border-slatey-200 pt-8">
+                {% for tag in article.tags %}
+                    <span class="tag">#{{ tag }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mt-10 rounded-2xl bg-hero-glow p-8 text-center">
+            <p class="font-display text-xl font-semibold text-white">Ready to put this into practice?</p>
+            <p class="mx-auto mt-2 max-w-md text-sm text-white/60">Dispatch helps your team plan work, generate code, and review pull requests — without changing how you already work in GitHub.</p>
+            <a href="https://upsun.com" class="btn btn-primary mt-5">Try Dispatch free</a>
+        </div>
+    </article>
+
+    {# ── More articles ────────────────────────────────────────────── #}
+    {% if more %}
+        <section class="border-t border-slatey-200 bg-slatey-50">
+            <div class="mx-auto max-w-6xl px-5 py-14">
+                <h2 class="mb-8 font-display text-2xl font-bold tracking-tight text-ink-950">Keep reading</h2>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {% for article in more %}
+                        {% include 'partials/_article_card.html.twig' %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

@@ -8,3 +8,8 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+###> dispatch blog ###
+# Local Tailwind standalone CLI (platform-specific binary; downloaded on demand).
+/tools/
+###< dispatch blog ###

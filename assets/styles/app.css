@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-white text-ink-950 font-sans antialiased;
+  }
+  ::selection {
+    background-color: #e6fb66;
+    color: #09090b;
+  }
+}
+
+@layer components {
+  /* Reusable accent pill used for categories / tags */
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slatey-200 bg-white px-3 py-1 text-xs font-medium uppercase tracking-wide text-slatey-600;
+  }
+  .tag-accent {
+    @apply border-transparent bg-ink-950 text-white;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors;
+  }
+  .btn-primary {
+    @apply bg-brand-blue text-white hover:bg-[#0042d6];
+  }
+  .btn-ghost {
+    @apply text-white/80 hover:text-white;
+  }
+
+  /* Animated horizon mark in the logo */
+  .logo-mark {
+    @apply inline-flex h-8 w-8 items-center justify-center;
+  }
+}
+
+/* Article typography — tuned on top of @tailwindcss/typography `prose` */
+.article-prose {
+  @apply prose prose-lg max-w-none prose-slate;
+}
+.article-prose :where(h2) {
+  @apply font-display font-bold tracking-tight mt-12 mb-4 text-ink-950 scroll-mt-24;
+}
+.article-prose :where(h3) {
+  @apply font-display font-semibold tracking-tight mt-8 mb-3 text-ink-950;
+}
+.article-prose :where(a) {
+  @apply font-medium text-brand-blue no-underline border-b border-brand-blue/30 hover:border-brand-blue;
+}
+.article-prose :where(blockquote) {
+  @apply border-l-2 border-brand-lime bg-slatey-50 not-italic font-normal text-slatey-700 rounded-r-lg py-1 pr-4;
+}
+.article-prose :where(code):not(pre code) {
+  @apply rounded bg-slatey-100 px-1.5 py-0.5 text-[0.85em] font-medium text-ink-900 before:content-none after:content-none;
+}
+.article-prose :where(pre) {
+  @apply bg-ink-950 text-slatey-100 rounded-xl text-sm leading-relaxed border border-ink-800;
+}
+.article-prose :where(table) {
+  @apply text-sm;
+}
+.article-prose :where(thead) {
+  @apply border-b-2 border-slatey-200;
+}

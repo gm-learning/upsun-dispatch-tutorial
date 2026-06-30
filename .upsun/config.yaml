@@ -1,5 +1,6 @@
-# Upsun configuration, generated using AI at: 2026-05-06T19:15:06-05:00
-# AI can make mistakes. Please modify this file to suit your needs.
+# Upsun configuration for the Dispatch demo blog.
+# A stateless Symfony app: articles live as committed markdown files, so no
+# database or persistent storage is required.
 applications:
   app:
     type: php:8.5
@@ -7,9 +8,19 @@ applications:
       flavor: none
     hooks:
       build: |
-        set -ex
+        set -e
         curl -sfS https://get.symfony.com/cloud/configurator | bash
         symfony-build
+
+        # Compile the Tailwind stylesheet with the standalone CLI (no Node needed).
+        # Best-effort: the committed public/build/app.css is used as a fallback
+        # if the binary cannot be downloaded during the build.
+        if curl -sfSL -o /tmp/tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64; then
+          chmod +x /tmp/tailwindcss
+          /tmp/tailwindcss -c tailwind.config.js -i assets/styles/app.css -o public/build/app.css --minify
+        else
+          echo "tailwindcss download failed; using committed public/build/app.css"
+        fi
 
       deploy: |
         set -ex
@@ -24,13 +35,8 @@ applications:
 
     runtime:
       extensions:
-        - pdo_pgsql
         - apcu
         - mbstring
-        - sodium
-
-    relationships:
-      database: {}
 
     mounts:
       var/cache:
@@ -41,10 +47,6 @@ applications:
     variables:
       php:
         opcache.preload: config/preload.php
-
-services:
-  database:
-    type: postgresql:18
 
 routes:
   https://{default}/:

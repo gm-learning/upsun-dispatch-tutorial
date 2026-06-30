@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Example Blog{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Field notes on cloud infrastructure and AI.{% endblock %}">
+
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;circle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22%23090b0e%22/&gt;&lt;path d=%22M7 20 A9 9 0 0 1 25 20 Z%22 fill=%22%23E6FB66%22/&gt;&lt;/svg&gt;">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/build/app.css">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+    <main class="flex-1">
+        {% block body %}{% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html.twig' %}
+</body>
+</html>

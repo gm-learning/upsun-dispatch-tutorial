@@ -1,38 +1,84 @@
-# obvious-symfony
+# Dispatch Blog — Symfony demo for Upsun
 
-A small Symfony 7.0 application used as the target for the Obvious agent demo.
+A small Symfony 7 application that simulates the **Dispatch** blog: an index of
+articles and individual article pages. Articles are authored as **Markdown files
+committed to this repository** — there is no database and no admin. It exists as
+a clean demo project for Upsun internal users.
 
-The pinned versions are intentionally a little behind current (Symfony 7.0,
-`composer audit` reports a handful of advisories) so the agent has realistic
-surfaces to plan changes against: add endpoints, extend services, fix bugs,
-or bump dependencies.
+- **Backend:** Symfony 7 (PHP 8.5), Twig — no JavaScript, no front-end framework.
+- **Content:** Markdown + YAML front matter under [`content/articles/`](content/articles/), rendered with [league/commonmark](https://commonmark.thephpleague.com/).
+- **Design:** Tailwind CSS, themed with the Upsun / Dispatch design system (dark indigo hero, lime + blue accents, `Space Grotesk` / `Inter`).
 
 ## Routes
 
-| Method | Path             | Returns                               |
-|--------|------------------|---------------------------------------|
-| GET    | `/`              | `{ app, message }`                    |
-| GET    | `/hello/{name}`  | `{ message: "Hello, <name>!" }`       |
+| Method | Path                  | Page                          |
+|--------|-----------------------|-------------------------------|
+| GET    | `/`                   | Blog index (featured + grid)  |
+| GET    | `/articles/{slug}`    | A single article              |
+
+The `{slug}` is the Markdown filename without its extension.
+
+## Project layout
+
+```
+content/articles/*.md          Articles (front matter + Markdown body)
+src/Blog/Article.php           Immutable article DTO
+src/Blog/ArticleRepository.php Reads & parses the Markdown files
+src/Controller/BlogController.php
+templates/                     Twig: base, partials, blog/index, blog/article
+assets/styles/app.css          Tailwind source
+public/build/app.css           Compiled stylesheet (committed)
+tailwind.config.js             Design tokens
+```
+
+## Adding an article
+
+Create `content/articles/my-slug.md` with front matter:
+
+```markdown
+---
+title: "My article title"
+description: "One-sentence summary shown on cards and meta tags."
+author: "Jane Doe"
+role: "Staff Engineer"
+date: "2026-06-30"
+category: "Platform Engineering"   # AI Engineering | Cloud Economics | Architecture | ...
+tags: ["tag-one", "tag-two"]
+featured: false                    # at most one featured article
+---
+
+Your Markdown body. Headings, lists, code blocks, blockquotes and tables
+are all supported (GitHub-flavored Markdown).
+```
+
+Reading time is computed automatically from the body.
 
 ## Run locally
 
 ```bash
 composer install
-symfony serve            # or: php -S 127.0.0.1:8000 -t public
+
+# Compile the stylesheet (downloads the standalone Tailwind CLI; no Node needed).
+# A precompiled public/build/app.css is already committed, so this is only
+# needed after changing templates or assets/styles/app.css.
+curl -sSL -o tools/tailwindcss \
+  https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-macos-arm64
+chmod +x tools/tailwindcss
+./tools/tailwindcss -c tailwind.config.js -i assets/styles/app.css -o public/build/app.css --minify
+
+# Serve
+symfony serve                                  # if the Symfony CLI is installed
+php -S 127.0.0.1:8000 -t public public/router.php   # otherwise (clean URLs + static assets)
 ```
 
-## How the Obvious demo flow works against this repo
+Then open <http://127.0.0.1:8000>.
 
-1. Open an issue describing a small feature or bug fix.
-2. Mention `@obvious-poc` (or assign the issue to the bot) to trigger the agent.
-3. The agent posts a Markdown plan as an issue comment.
-4. Reply with `approve` to let the agent implement the plan.
-5. The agent opens a draft PR with the changes.
-6. Approve the PR (in GitHub or the dashboard) to merge it and auto-close the issue.
+> `public/router.php` is a dev-only helper so the built-in PHP server serves
+> static assets and routes everything else through the front controller.
 
-Sample issues to try:
+## Deploy on Upsun
 
-- "Add a `/healthz` endpoint that returns `{ status: ok }`."
-- "Return 404 instead of 500 when `/hello/{name}` receives a name longer than 64 chars."
-- "Add a `/version` endpoint that returns the Symfony version and PHP version."
-- "Bump `symfony/http-foundation` to a patched release to clear current security advisories."
+[`.upsun/config.yaml`](.upsun/config.yaml) defines a single stateless PHP app
+(no services required). The build hook runs `symfony-build` and then compiles
+the Tailwind stylesheet with the standalone CLI, falling back to the committed
+`public/build/app.css` if the binary can't be downloaded.
